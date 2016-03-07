@@ -1,10 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-<<<<<<< HEAD
+# Reproducible Research: Peer Assessment 1
 ##Introduction:
 This assignment uses data from collected from a personal activity monitoring device, which measured movement of an anonymous individual, over the course of the 61 days comprising October and November 2012. Pedometer data was collected at 5 minute intervals through out the day. 
 
@@ -14,7 +8,8 @@ The script requires use of the following libraries: data.table, ggplot2.
 
 This code assumes that par() is set to default at the beginning of the script. Other settings might produce less effective plots.
 
-```{r working_directory_REMOVE FOR SUBMISSION}
+
+```r
 #Remove for submission:
 setwd("C:/Users/Michelle/Desktop/Coursera/Reproducible_Research/Week_1/RepData_PeerAssessment1-master")
 ```
@@ -24,7 +19,8 @@ setwd("C:/Users/Michelle/Desktop/Coursera/Reproducible_Research/Week_1/RepData_P
 ## Loading and preprocessing the data
 1. Loading the data
 The data may be loaded from the URL shown below. Data for this analysis was downloaded on March 2, 2016.
-```{r loading_data}
+
+```r
 #Check if files are present in the working directory, and download them if they are not.
 
 if(!file.exists("activity.csv")){
@@ -39,7 +35,8 @@ activity <- read.csv("activity.csv", stringsAsFactors = FALSE, na.strings = "NA"
 
 2. Process data to prepare it for analysis
 
-```{r processing_data}
+
+```r
 #change the "date" variable from character format to date format. 
 activity$date <- as.Date(activity$date, "%Y-%m-%d") 
 
@@ -50,19 +47,14 @@ activity$interval<-as.character(sprintf("%04d",activity$interval))
 activity$interval<-as.ITime(activity$interval, format = "%H%M")
 ```
 
-=======
-
-
-## Loading and preprocessing the data
->>>>>>> 80edf39c3bb508fee88e3394542f967dd3fd3270
 
 
 
 ## What is mean total number of steps taken per day?
-<<<<<<< HEAD
 #####Missing values will be ignored at this point.
 1. Make a histogram of the total number of steps taken each day
-```{r histogram_steps_per_day}
+
+```r
 #Calculate total steps per day:
 steps_per_day<-unlist(lapply(with(activity, split(steps, date)), 
                                         sum, na.rm = TRUE))
@@ -77,18 +69,33 @@ steps_per_day<-unlist(lapply(with(activity, split(steps, date)),
             ylab = "Number of Days"
             ) 
 ```
+
+![](PA1_template_files/figure-html/histogram_steps_per_day-1.png)\
     
 2. Calculate the mean and median total number of steps taken each day:
-```{r mean_and_median_steps_per_day}
+
+```r
     mean(steps_per_day)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
     median(steps_per_day)
 ```
 
-This individual took an average of `r round(mean(steps_per_day),1)` steps per day during the period of data collections. The median number of steps per day was slightly higher, at `r median(steps_per_day)`. This reflects what is seen in the histogram: on many days, zero steps were recorded. Missing data should be suspected.
+```
+## [1] 10395
+```
+
+This individual took an average of 9354.2 steps per day during the period of data collections. The median number of steps per day was slightly higher, at 10395. This reflects what is seen in the histogram: on many days, zero steps were recorded. Missing data should be suspected.
 
 ## What is the average daily activity pattern?
 1. Make a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days.
-```{r daily_activity_time_series}
+
+```r
     #find the average number of steps in each interval
     avg_steps<-aggregate(activity, by = list(activity$interval), 
                               FUN = mean, na.rm = TRUE)
@@ -98,25 +105,42 @@ This individual took an average of `r round(mean(steps_per_day),1)` steps per da
                 main = "Average Steps Recorded Per 5 Minute Interval",
                 ylab = "Average Number of steps",
                 xlab = "Time(hours) at the beginning of the interval")
-
 ```
+
+![](PA1_template_files/figure-html/daily_activity_time_series-1.png)\
 
 2. Which daily interval has the maximum mean number of steps?
    
-```{r max_steps_interval}
+
+```r
     daily_max_average<-subset(avg_steps, steps == max (steps))[, 1]
     daily_max_average
+```
+
+```
+## [1] "08:35:00"
 ```
 The interval with maximum mean number of steps starts at 8:35am.
 
 ## Imputing missing values
 1. How many rows contain missing values?
-```{r missing_value_evaluation}
+
+```r
   sum(!complete.cases(activity))
-  sum(!complete.cases(activity))/nrow(activity)
+```
 
 ```
-There are `r sum(!complete.cases(activity))` rows with missing values. This is `r round(100*sum(!complete.cases(activity))/nrow(activity), 1)`% of the dataset.
+## [1] 2304
+```
+
+```r
+  sum(!complete.cases(activity))/nrow(activity)
+```
+
+```
+## [1] 0.1311475
+```
+There are 2304 rows with missing values. This is 13.1% of the dataset.
     
 2. Devise a strategy for filling in all of the missing values in the dataset. 
 
@@ -124,8 +148,8 @@ I will replace missing values with the mean number of steps for that interval, a
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r missing_value_replacement}
-    
+
+```r
     #change variable names for smoother merge
     names(avg_steps)<-c("interval","average_steps","date2","interval2")
 
@@ -145,9 +169,8 @@ I will replace missing values with the mean number of steps for that interval, a
 
 4. Make a histogram showing steps taken per day, using the data with imputed values to replace NA. Also, use the dataset with imputed values to find the mean and median number of steps per day. 
 
-```{r steps_per_day_fixedNA}
 
-
+```r
 steps_per_day_imputed<-unlist(lapply(with(activity_imputed, split(steps, date)), 
                             sum, na.rm = TRUE))
 
@@ -160,22 +183,35 @@ steps_per_day_imputed<-unlist(lapply(with(activity_imputed, split(steps, date)),
             xlab = "Steps per Day, estimated",
             ylab = "Number of Days"
             ) 
- 
-```                                       
+```
+
+![](PA1_template_files/figure-html/steps_per_day_fixedNA-1.png)\
 
 
-```{r steps_per_day_fixedNA_2}
+
+```r
     mean(steps_per_day_imputed)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
     median(steps_per_day_imputed)
 ```
 
-The mean total number of steps taken per day is `r format(mean(steps_per_day_imputed), scientific=F)`, when corrected for missing values; the median number of steps taken per day is also `r format(median(steps_per_day_imputed), scientific=F)`.
+```
+## [1] 10766.19
+```
+
+The mean total number of steps taken per day is 10766.19, when corrected for missing values; the median number of steps taken per day is also 10766.19.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 1. Create a new factor variable in the dataset to indicate if the date is on a weekday or weekend.
 
-```{r weekends_vs_weekdays_variable_creation}
 
+```r
   #create the day_type variable.
   activity_imputed$day_type <-0
   weekends<-c("Saturday", "Sunday")
@@ -189,14 +225,12 @@ The mean total number of steps taken per day is `r format(mean(steps_per_day_imp
     activity_imputed[i,4]<-NA
     }
   }
-  
 ```
 
 2. Make a panel plot containing a time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days. 
 
-```{r weekend_and_weekday_timeseries}
 
-
+```r
       #find the average number of steps in each interval
       
       weekend_activity<-subset(activity_imputed, day_type == "weekend")
@@ -225,11 +259,17 @@ qplot(interval/3600, mean_steps, data=avg_steps_by_daytype,
       main="Average Steps Estimated Per 5 Minute Interval") 
 ```
 
+```
+## Don't know how to automatically pick scale for object of type ITime. Defaulting to continuous
+```
+
+![](PA1_template_files/figure-html/weekend_and_weekday_timeseries-1.png)\
+
 
 ##Final Notes
 This analysis indicates that the subject walked an average of ~10K steps per day. This is a level of physical activity that is [recommended by various fitness groups, with some controversy](http://nymag.com/scienceofus/2015/06/how-many-steps-a-day-really-walk.html). Daily activity started earlier on weekdays than on weekends, and also subsides earlier on weekdays than on weekends. There was an early peak of daily activity on weekdays (at 8:30am) that is not pronounced on weekends.
 
-Imputation to replace missing values was used, but in a manner with questionable validity. Ideally, we would assess if the missing data were MCAR(missing completely at random) or MNAR(missing not at random) before attempting imputation. Please consider [further reading](http://www.r-bloggers.com/imputing-missing-data-with-r-mice-package/) on this subject.
+Imputation to replace missing values was used, but possibly in a way that is not particularly valid. Ideally, we would assess if the missing data were MCAR(missing completely at random) or MNAR(missing not at random) before attempting imputation. Please consider [further reading](http://www.r-bloggers.com/imputing-missing-data-with-r-mice-package/) on this subject.
 
 ####Final R Code Notes
 Alternative methods of formatting the interval variable should be pursued; the current format is difficult to properly apply to axes in plots.
@@ -239,17 +279,3 @@ This report answers week 1 homework questions for Reproducible Research.  Reprod
 This file was obtained from Dr. Peng's github repo on March 2, 2016; It is available at:    https://github.com/rdpeng/RepData_PeerAssessment1.
 
 This file was last edited by Michelle Birt Leeds on March 3, 2016.  
-=======
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
->>>>>>> 80edf39c3bb508fee88e3394542f967dd3fd3270
